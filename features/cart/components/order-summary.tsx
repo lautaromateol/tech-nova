@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation"
 import { CartContextInterface, useCartContext } from "@/contexts/cart-context"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { useCreatePaymentSession } from "@/features/order/hooks/use-create-payment-session"
+import { useCreatePaymentSession } from "@/features/stripe/hooks/use-create-payment-session"
 import { User } from "@/features/user/types"
 import { CartItem } from "./cart-item"
 
