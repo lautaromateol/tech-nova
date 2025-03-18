@@ -1,13 +1,13 @@
 "use client"
 import { useRouter } from "next/navigation"
 import { CartContextInterface, useCartContext } from "@/contexts/cart-context"
+import { useCreatePaymentSession } from "@/features/stripe/hooks/use-create-payment-session"
+import { UserDto } from "@/features/user/dtos/user-dto"
 import { Separator } from "@/components/ui/separator"
 import { Button } from "@/components/ui/button"
-import { useCreatePaymentSession } from "@/features/stripe/hooks/use-create-payment-session"
-import { User } from "@/features/user/types"
 import { CartItem } from "./cart-item"
 
-export function OrderSummary({ redirect, dbUser, token }: { redirect?: boolean, dbUser?: User, token: string }) {
+export function OrderSummary({ redirect, dbUser, token }: { redirect?: boolean, dbUser?: UserDto, token: string }) {
 
   const { cartItems, totalQuantity }: CartContextInterface = useCartContext()
 
