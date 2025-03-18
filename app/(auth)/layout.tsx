@@ -1,9 +1,9 @@
-import { getUser } from "@/actions/get-user"
+import { getUserToken } from "@/features/user/actions/get-user"
 import { redirect } from "next/navigation"
 
 export default async function AuthLayout({ children }: { children: React.ReactNode }) {
 
-  const user = await getUser()
+  const user = await getUserToken()
 
   if(user) {
     redirect("/")

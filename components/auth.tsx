@@ -1,13 +1,13 @@
 import Link from "next/link";
-import { getUser } from "@/actions/get-user";
+import { getUserToken } from "@/features/user/actions/get-user";
 import { Button } from "./ui/button";
 import { UserDropdown } from "@/features/auth/components/user-dropdown";
 
 export async function Auth() {
 
-  const user = await getUser()
+  const response = await getUserToken()
 
-  if (!user) {
+  if (!response) {
     return (
       <Button asChild>
         <Link href="/sign-in">
@@ -16,6 +16,8 @@ export async function Auth() {
       </Button>
     )
   }
+
+  const { user } = response
 
   return (
     <UserDropdown user={user} />
