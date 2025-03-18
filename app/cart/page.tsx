@@ -8,7 +8,7 @@ export default async function CartPage() {
 
   if(!response) {
     return(
-      <OrderSummary redirect />
+      <OrderSummary  token="" redirect />
     )
   }
 
