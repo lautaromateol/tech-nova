@@ -85,7 +85,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Get a product by ID */
+        /** Get a product by slug */
         get: operations["ProductsController_getProductBySlug"];
         put?: never;
         post?: never;
@@ -165,7 +165,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/orders": {
+    "/stripe/create-payment-session": {
         parameters: {
             query?: never;
             header?: never;
@@ -174,8 +174,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a order */
-        post: operations["OrdersController_addOrder"];
+        post: operations["StripeController_createPaymentSession"];
         delete?: never;
         options?: never;
         head?: never;
@@ -512,6 +511,7 @@ export interface components {
         Products: {
             /** Format: uuid */
             id: string;
+            quantity: number;
         };
         CreateOrderDto: {
             /**
@@ -521,21 +521,6 @@ export interface components {
             userId: string;
             /** @description An array of the products ID's of the current order. */
             products: components["schemas"]["Products"][];
-        };
-        OrderDataDto: {
-            /**
-             * @description The price of the order
-             * @example 100.5
-             */
-            price: number;
-            /**
-             * Format: uuid
-             * @description The ID of the order details
-             */
-            orderDetailsId: string;
-        };
-        CreateOrderResponseDto: {
-            data: components["schemas"]["OrderDataDto"];
         };
         CreateUserDto: {
             /**
@@ -981,9 +966,8 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description Slug of the product */
                 slug: string;
-                /** @description ID of the product */
-                id: string;
             };
             cookie?: never;
         };
@@ -1226,14 +1210,13 @@ export interface operations {
             };
         };
     };
-    OrdersController_addOrder: {
+    StripeController_createPaymentSession: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** @description Data for creating a order */
         requestBody: {
             content: {
                 "application/json": components["schemas"]["CreateOrderDto"];
@@ -1245,36 +1228,8 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["CreateOrderResponseDto"];
+                    "application/json": Record<string, never>;
                 };
-            };
-            /** @description This products are not available. */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Unauthorized. */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description User not found. */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description There was an error processing the order. Try again later. */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
         };
     };
