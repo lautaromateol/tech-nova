@@ -5,6 +5,7 @@ import { API_URL } from "@/constants/api-url";
 import { AddOrderDto } from "@/features/order/dtos/add-order-dto";
 import { AddOrderResponseDto } from "@/features/order/dtos/add-order-response-dto";
 import { ProductDto } from "@/features/product/dtos/product-dto";
+import { revalidateTag } from "next/cache";
 
 const stripe = new Stripe(process.env.STRIPE_API_KEY!, { apiVersion: "2025-02-24.acacia" })
 
@@ -86,8 +87,13 @@ export async function POST(req: NextRequest) {
           }
 
           const data: AddOrderResponseDto = await orderResponse.json()
+
+          if(data.success) {
+            products.forEach((product) => revalidateTag(`product-${product.slug}`))
+            
+            return NextResponse.json({ success: true, order: data.order }, { status: 201 })
+          }
           
-          return NextResponse.json({ success: true, order: data.order }, { status: 201 })
         }
     }
 
