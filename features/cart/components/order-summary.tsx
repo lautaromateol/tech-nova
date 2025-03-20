@@ -25,7 +25,8 @@ export function OrderSummary({ redirect, dbUser, token }: { redirect?: boolean, 
         id: item.id,
         quantity: item.quantity
       })),
-      userId: dbUser!.id
+      userId: dbUser!.id,
+      token
     })
   }
 
