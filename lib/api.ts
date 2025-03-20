@@ -165,6 +165,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Create a order */
+        post: operations["OrdersController_addOrder"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/stripe/create-payment-session": {
         parameters: {
             query?: never;
@@ -175,6 +192,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["StripeController_createPaymentSession"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stripe/get-session-details/{session_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["StripeController_getSessionDetails"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/stripe/webhook": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["StripeController_webhook"];
         delete?: never;
         options?: never;
         head?: never;
@@ -302,7 +351,7 @@ export interface components {
             /** @description The updated product */
             category: components["schemas"]["SaveCategoryResponseDto"];
         };
-        CreateProductDto: {
+        SaveProductDto: {
             /**
              * @description The name of the product
              * @example Smartphone X
@@ -381,29 +430,6 @@ export interface components {
             /** @description The loaded products from the seed */
             products: components["schemas"]["ProductResponseDto"][];
         };
-        OrderResponseDto: {
-            /**
-             * Format: uuid
-             * @description Order UUID
-             */
-            id: string;
-            /**
-             * Format: date-time
-             * @description Date when the order was created
-             * @example 2023-10-01
-             */
-            date: string;
-            /**
-             * @description UUID of the user who placed the order
-             * @example 123e4567-e89b-12d3-a456-426614174000
-             */
-            userId: string;
-            /**
-             * Format: uuid
-             * @description UUID of the order details entity
-             */
-            orderDetailsId: string;
-        };
         UserResponseDto: {
             /**
              * Format: uuid
@@ -445,8 +471,6 @@ export interface components {
              * @example false
              */
             isAdmin: boolean;
-            /** @description List of orders associated with the user */
-            orders: components["schemas"]["OrderResponseDto"][];
         };
         PaginatedUsersResponseDto: {
             /** @description List of users */
@@ -508,17 +532,193 @@ export interface components {
             /** @description The updated user */
             user: components["schemas"]["UserResponseDto"];
         };
+        CartItemEntity: {
+            id: string;
+            title: string;
+            slug: string;
+            price: number;
+            image: string;
+            quantity: number;
+            order: components["schemas"]["OrderEntity"];
+            orderId: string;
+        };
+        OrderEntity: {
+            /** @default 22c3eb36-5083-46da-8ac8-e3150daa2692 */
+            id: string;
+            chargeId: string;
+            payment_intent: string;
+            receipt_url: string;
+            refunded: boolean;
+            status: string;
+            amount_captured: number;
+            currency: string;
+            /** Format: date-time */
+            createdAt: string;
+            user: components["schemas"]["UserEntity"];
+            userId: string;
+            cartItems: components["schemas"]["CartItemEntity"][];
+        };
+        UserEntity: {
+            /** @default 7c692708-26d4-417d-9bf7-a66957d276df */
+            id: string;
+            name: string;
+            email: string;
+            password: string;
+            phone?: number;
+            country?: string;
+            address?: string;
+            city?: string;
+            isAdmin: boolean;
+            orders: components["schemas"]["OrderEntity"][];
+        };
+        CartItemDTO: {
+            /**
+             * @description ID of the cart item
+             * @example 1
+             */
+            id: string;
+            /**
+             * @description Title of the product in the cart
+             * @example Product A
+             */
+            title: string;
+            /**
+             * @description Slug of the product in the cart
+             * @example product-a
+             */
+            slug: string;
+            /**
+             * @description Price of the product in the cart
+             * @example 29.99
+             */
+            price: number;
+            /**
+             * @description Image URL of the product in the cart
+             * @example https://example.com/product-a.jpg
+             */
+            image: string;
+            /**
+             * @description Quantity of the product in the cart
+             * @example 2
+             */
+            quantity: number;
+        };
+        AddOrderDto: {
+            /**
+             * @description Charge ID from the payment gateway
+             * @example ch_1A2b3C4d5E6f7G8h9I0j
+             */
+            chargeId: string;
+            /**
+             * @description Payment intent ID from the payment gateway
+             * @example pi_1A2b3C4d5E6f7G8h9I0j
+             */
+            payment_intent: string;
+            /**
+             * @description Receipt URL from the payment gateway
+             * @example https://example.com/receipt
+             */
+            receipt_url: string;
+            /**
+             * @description Whether the order has been refunded
+             * @example false
+             */
+            refunded: boolean;
+            /**
+             * @description Status of the order
+             * @example succeeded
+             */
+            status: string;
+            /**
+             * @description Amount captured in the order
+             * @example 100
+             */
+            amount_captured: number;
+            /**
+             * @description Currency of the order
+             * @example usd
+             */
+            currency: string;
+            /**
+             * Format: uuid
+             * @description UUID of the user who placed the order
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+            /** @description List of cart items in the order */
+            cartItems: components["schemas"]["CartItemDTO"][];
+        };
+        OrderResponseDto: {
+            /**
+             * @description Charge ID from the payment gateway
+             * @example ch_1A2b3C4d5E6f7G8h9I0j
+             */
+            chargeId: string;
+            /**
+             * @description Payment intent ID from the payment gateway
+             * @example pi_1A2b3C4d5E6f7G8h9I0j
+             */
+            payment_intent: string;
+            /**
+             * @description Receipt URL from the payment gateway
+             * @example https://example.com/receipt
+             */
+            receipt_url: string;
+            /**
+             * @description Whether the order has been refunded
+             * @example false
+             */
+            refunded: boolean;
+            /**
+             * @description Status of the order
+             * @example succeeded
+             */
+            status: string;
+            /**
+             * @description Amount captured in the order
+             * @example 100
+             */
+            amount_captured: number;
+            /**
+             * @description Currency of the order
+             * @example usd
+             */
+            currency: string;
+            /**
+             * Format: uuid
+             * @description UUID of the user who placed the order
+             * @example 123e4567-e89b-12d3-a456-426614174000
+             */
+            userId: string;
+            /** @description List of cart items in the order */
+            cartItems: components["schemas"]["CartItemDTO"][];
+            /**
+             * Format: uuid
+             * @description Order UUID
+             */
+            id: string;
+        };
+        AddOrderResponseDto: {
+            /**
+             * @description Indicates if the operation was successful
+             * @example true
+             */
+            success: boolean;
+            order: components["schemas"]["OrderResponseDto"];
+        };
         Products: {
             /** Format: uuid */
             id: string;
             quantity: number;
         };
-        CreateOrderDto: {
+        CreatePaymentSessionDto: {
             /**
              * Format: uuid
              * @description The UUID of the user who is making the order.
              */
             userId: string;
+            /** @description The Bearer Token of the user. */
+            token: string;
             /** @description An array of the products ID's of the current order. */
             products: components["schemas"]["Products"][];
         };
@@ -822,7 +1022,7 @@ export interface operations {
         /** @description Data for creating a product */
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateProductDto"];
+                "application/json": components["schemas"]["SaveProductDto"];
             };
         };
         responses: {
@@ -1191,7 +1391,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["OrderResponseDto"];
+                    "application/json": components["schemas"]["OrderEntity"];
                 };
             };
             /** @description Unauthorized. */
@@ -1210,6 +1410,58 @@ export interface operations {
             };
         };
     };
+    OrdersController_addOrder: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Data for creating a order */
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddOrderDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddOrderResponseDto"];
+                };
+            };
+            /** @description These products are not available. */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description User not found. */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description There was an error processing the order. Try again later. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     StripeController_createPaymentSession: {
         parameters: {
             query?: never;
@@ -1219,7 +1471,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateOrderDto"];
+                "application/json": components["schemas"]["CreatePaymentSessionDto"];
             };
         };
         responses: {
@@ -1230,6 +1482,44 @@ export interface operations {
                 content: {
                     "application/json": Record<string, never>;
                 };
+            };
+        };
+    };
+    StripeController_getSessionDetails: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                session_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    StripeController_webhook: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
